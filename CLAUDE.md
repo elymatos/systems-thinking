@@ -27,8 +27,12 @@ least a close relative, of the "situations" framework this repo is meant to feed
   exists anymore; the old `/home/ematos/devel/SystemThinking/` working directory was retired
   once everything here was verified live).
 - **`resource/`** — the original source PDFs (ebooks + slide guides from the Systems Innovation
-  Network's 20-guide series). **Gitignored, local-only, no backup elsewhere** — this is the sole
-  copy of the source material, so don't delete it.
+  Network's 20-guide series), plus `capra.txt` (an excerpt from Fritjof Capra's *The Hidden
+  Connections*) and `resource/docs/` — numbered, exploratory discussion notes for the
+  image-schema/conceptual-dimension phase (not governed, not polished — a record of reasoning to
+  preserve across sessions, kept separate from the `content/` chapters' citation discipline).
+  **Tracked in git as of 2026-08-13** (previously gitignored as local-only with no backup; now
+  backed up via git instead, and will be publicly visible once pushed to `origin/main`).
 - **`quartz/`, `quartz.config.yaml`, `quartz.ts`, etc.** — the Quartz site generator itself
   (upstream `jackyzha0/quartz`, v5). Not usually something to touch; content changes alone are
   enough to update the site.
