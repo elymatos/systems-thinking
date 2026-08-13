@@ -113,8 +113,6 @@ on its own.
 
 ## 5. What's still completely open
 
-- Whether "Attention as Binding" holds up under a closer read, or is a looser metaphor than the
-  abstract suggests — worth reading in full before leaning on it further.
 - Whether schema-element directions are actually **findable** in a real model at all, versus schema
   distinctions this framework cares about (e.g. `Agonist` vs. `Antagonist`, force vs. no-force)
   simply not being linearly separable in any given model's activation space.
@@ -123,10 +121,65 @@ on its own.
   latter shaping *what a given representation means*) that would both end up needed.
 - The B.1 constraint vocabulary itself still has to be built either way, and hasn't been started.
 
+## 5a. Correction, after reading the full paper (2026-08-13, same-day follow-up)
+
+§5's first bullet asked whether "Attention as Binding" holds up under a closer read. It's now
+been read in full ([Dhayalkar 2025/2026, AAAI](https://arxiv.org/pdf/2512.14709), single-author,
+Arizona State University). Two corrections to how §1 used it:
+
+**It is not an empirical result — it's a same-genre theoretical argument, not independent
+evidence.** The paper says so about itself: "Rather than a conventional survey, this paper offers
+a *conceptual synthesis*..." It runs **no experiments**. Everything that would actually test the
+claim — "VSA-likeness" metrics (role–filler recoverability, interference under superposition,
+alignment with VSA operators), representational-similarity/probing analyses, behavioral
+benchmarks — is laid out in an "Open problems and research agenda" section as *proposed* future
+work, not conducted work. The paper's own "Approximation gap" section is explicit that the
+binding/unbinding reading holds only when learned projections happen to be near-orthogonal and
+attention happens to be sparse/crisp — conditions it does not check in any real model, because it
+checks none. So §1's framing ("if that holds up under closer reading, B.2 isn't a separate layer
+but a description of what B.3 is already doing") overstated what closer reading could settle: there
+is no empirical claim in the paper to hold up or fail. What the paper *does* provide is a second,
+independently-arrived-at theoretical argument for the same B.2≈B.3 intuition Discussion 1's
+transformer-clustering literature already pointed at (§4.4 there) — real corroborating weight for
+*a hypothesis worth testing*, not confirmation of the hypothesis itself. The net verdict in §1
+("B.2 ↔ B.3 turns out closer than Discussion 2 estimated") should be read as "closer as a
+*conjecture two independent theoretical lines now converge on*," not as an empirically narrowed
+gap.
+
+**A second, sharper distinction the paper makes that §1 didn't carry over:** its central claim —
+attention *as it already exists*, unmodified, is interpretable as soft binding — is about
+*current, off-the-shelf* transformers. That's the right target for the probing Discussion 3
+proposes (finding directions in an *existing* open-weight model). Separately, the paper's own
+"Designing VSA-inspired transformer layers" section proposes **explicit binding/unbinding heads**
+and a **hyperdimensional memory layer** (eq. 8: `m ← m ⊕ Σ_k r_k ⊗ f_k`) as *new* architecture —
+these are not evidence about current models at all, they're a competing, more invasive proposal
+(build the mechanism in, rather than find it already there). Worth keeping these two apart:
+Discussion 3's research question (§4) is squarely the "find it, don't build it" branch; the
+hyperdimensional-memory-layer idea is closer to a fallback if directions turn out not to be
+findable, not a next step on the same path.
+
+**What the paper does hand over directly usable, regardless of the above:** concrete metric
+definitions this project can borrow verbatim for the probing task in §6 below —
+*role–filler recoverability* (inject synthetic role/filler pairs, e.g. via prompts or residual
+edits, and measure whether a probe cued with the role vector recovers the filler), *interference
+under superposition* (vary how many bindings are superposed at once and measure where recovery
+degrades — a direct empirical handle on whether `Agonist`/`Antagonist`/`Interior` bindings survive
+being packed into the same residual stream alongside a whole sentence's worth of other bindings),
+and *alignment with VSA operators* (fit a simple binding operator, e.g. circular convolution, to a
+head's actual input→output behavior and measure the fit). These map onto exactly the "what probe,
+what counts as evidence" question §6 already poses — they're a ready-made starting methodology,
+not a new open thread.
+
 ## 6. Next session
 
 Proposed starting point, deferred to continue later: take one of *entrar*'s already fully-worked
 bindings (`PROCESS.Antagonist`, `CONTAINER.Interior`, the shared token `r_joão` from
 `dynamic_schemas_proposal.md` §4.6) and think through, concretely, what it would take to go
 looking for a corresponding direction in a real open-weight model — what probe to train it against,
-what would count as evidence it exists versus evidence it doesn't.
+what would count as evidence it exists versus evidence it doesn't. §5a's three borrowed metrics
+give this a concrete shape rather than starting from a blank page: role–filler recoverability as
+the base test (can a probe cued on an `Agonist`-role vector recover the `r_joão` filler?),
+interference under superposition as the stress test (does recovery hold up once *entrar*'s two
+groundings, `PROCESS.Antagonist` and `CONTAINER.Interior`, are both present in the same sentence's
+residual stream, not just one at a time?), and alignment-with-VSA-operators as a sanity check on
+whether the recovered direction behaves like a binding at all, or just a correlated feature.
