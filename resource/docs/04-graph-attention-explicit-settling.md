@@ -191,7 +191,9 @@ which every one of B.1–B.3 still needs regardless of how candidates get genera
    probing work already queued in [Discussion 3](03-b3-attention-as-guardrail.md#6-next-session) —
    the two lines of work (probe a pretrained LLM for hidden directions vs. build an explicit graph
    architecture) are not mutually exclusive and may be worth pursuing as parallel, comparable
-   approaches to the same settling problem rather than a forced choice.
+   approaches to the same settling problem rather than a forced choice. **Update:** a first pilot
+   run of the probing half is in — see §10 below. Pipeline built and validated; small-N tiny-model
+   result in hand; real target models still to run on a GPU machine.
 4. Check whether the same three-tier graph design transfers to the image case (Part A.3's
    region-as-evoking-element point) without modification, or whether image regions need a fourth
    node kind of their own.
@@ -199,3 +201,67 @@ which every one of B.1–B.3 still needs regardless of how candidates get genera
    instance→instance) actually come from in practice — this is still B.1's unbuilt constraint
    vocabulary, now doubling as the graph-construction step for whichever settling mechanism runs
    on top of it.
+
+## 10. First empirical data point: the entrar activation probe (2026-08-13, same-day follow-up)
+
+Before this discussion's own two-track suggestion (§9.3 — probe a pretrained model *and* build an
+explicit graph, in parallel rather than as a forced choice) could stay purely hypothetical, the
+probing half got a first real run, using local Ollama models as a jumping-off point and then going
+underneath Ollama's API into actual per-layer residual-stream activations. Full pipeline and
+sentence data live in `devel/entrar_probe/` (see its `README.md` for the complete design and how
+to rerun on a GPU machine). Two things are worth folding back into this discussion specifically,
+rather than just Discussion 3's — because both bear directly on §8's risk argument.
+
+**What was tested.** Whether a single entity token's hidden state — at the same position, across a
+controlled set of otherwise-matched sentences — carries a linearly recoverable signal of which
+schema role it's playing: `PROCESS.Antagonist` alone, `CONTAINER.Interior` alone, both at once (the
+*entrar* blend, matching `dynamic_schemas_proposal.md` §4.6's `r_joão`), or neither (a neutral
+property-ascription control). Two independent linear probes (`is_antagonist`, `is_interior`), each
+trained only on its own pure/neutral classes, were then scored on the **held-out** blend condition —
+does a shared token trigger both probes at once, the way the instance layer's shared-pool design
+says it should?
+
+**A methodological finding worth keeping, independent of the result.** The first version of this
+experiment reported a completely degenerate signal — cosine similarity of exactly 1.0000 between
+every condition at every layer. Tempting to read as "no structure here," but it was a bug specific
+to how these models work: the target names were sentence-initial, and a **causal decoder's token
+can only attend to what precedes it** — a sentence-initial token's representation is fixed by its
+own token id and position alone, structurally unable to reflect a verb or container that comes
+*after* it in the sentence, no matter how many layers deep you look. This matters beyond this one
+experiment: it's a standing constraint on *any* future attempt to probe or steer a causal LLM's
+activations for this framework's role–filler structure (the B.3 line generally, not just this
+pilot) — the target token has to be positioned so it can causally attend to the content that
+determines its role, e.g. by re-mentioning the entity after the role-defining clause, which is
+exactly the fix applied here.
+
+**What the (tiny, 0.5B, CPU-only) smoke-test model actually showed, once fixed.** Real,
+permutation-baseline-cleared signal: `is_interior` reached 0.94 leave-one-out CV accuracy by late
+layers against a shuffled-label null of ~0.51–0.57 (95th percentile ≈ 0.70–0.81); `is_antagonist`
+reached 0.83, clearing its own null less consistently. But on the held-out blend condition, neither
+probe fired together — `blend: %BOTH-positive` read 0.0% at nearly every layer. Instead there was a
+clean **depth-dependent handoff**: early-to-mid layers classify the blend entity as
+`interior`-positive (up to 100%) and `antagonist`-negative; late layers flip to
+`antagonist`-positive (up to 100%) and `interior`-negative. The neutral control correctly scored
+negative on both probes throughout.
+
+**Why this belongs in Discussion 4, not just Discussion 3.** §8 above frames this whole discussion
+as de-risking B.3: building an explicit graph over the type/instance/token structure sidesteps
+having to *find* the shared-token binding already sitting, unlabeled, inside a pretrained
+transformer. This pilot is a first, small, not-yet-generalizable data point on exactly that
+question — and what it found was not a stable superposition (both bindings held at once, which is
+what the instance layer's shared-pool design actually requires — `r_joão` is simultaneously bound
+to `PROCESS.Antagonist` and `CONTAINER.Interior`, not bound to one and then the other). What it
+found instead looks more like a **sequential resolution across depth** than a superposition. If
+that pattern held up on the real target models (it hasn't been tested there yet — this was a 0.5B
+model chosen only to validate the pipeline on a GPU-less machine, not one of the models the actual
+question is about), it would be a concrete point *in favor* of §8's argument: a pretrained
+transformer settling on one role reading and then the other, rather than holding both
+simultaneously, is a real obstacle for B.3 specifically, and doesn't afflict a graph architecture
+built to hold `r_joão` as one instance bound into two roles at once by construction.
+
+**What would actually settle this:** rerunning the identical pipeline against `Qwen2.5-7B-Instruct`
+and `CohereForAI/aya-expanse-8b` — the real local-equivalent models, per `devel/entrar_probe/
+README.md`'s Ollama-tag-to-HF-repo-id table — on a GPU machine. Scale could change this either way:
+a bigger model might hold genuine superposition where a 0.5B one can't, or the same sequential
+handoff might persist regardless of scale, which would be the more interesting and more
+load-bearing result for this discussion's argument. Not run yet; flagged here rather than assumed.

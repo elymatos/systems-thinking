@@ -1,0 +1,32 @@
+{
+  "_comment": "Sentence set for the entrar activation probe (Discussion 3 Sec 6 / Discussion 4). Four conditions -- antagonist_only, interior_only, blend, and neutral (no PROCESS, no CONTAINER; a plain property ascription, the negative control for both probes) -- each realized with the same 6 name/container pairs so lexical identity doesn't confound the class label. Every sentence is two clauses: a first clause carrying the role content, and an identical neutral second clause ('{Name} sorriu.', name smiled) that reintroduces the entity. 'target_surface' is extracted at its LAST occurrence (the second clause) deliberately -- in a causal decoder, a token's hidden state can only attend to what precedes it, so a sentence-initial name (the first clause's subject) can never be influenced by the role-disambiguating content that follows it. The second mention can attend back across the whole first clause, so it's the only position where role information can actually show up.",
+  "sentences": [
+    { "id": "ant_1", "label": "antagonist_only", "name": "Joao",   "container": null,  "text": "Joao correu. Joao sorriu." },
+    { "id": "ant_2", "label": "antagonist_only", "name": "Maria",  "container": null,  "text": "Maria caminhou. Maria sorriu." },
+    { "id": "ant_3", "label": "antagonist_only", "name": "Pedro",  "container": null,  "text": "Pedro cresceu. Pedro sorriu." },
+    { "id": "ant_4", "label": "antagonist_only", "name": "Ana",    "container": null,  "text": "Ana envelheceu. Ana sorriu." },
+    { "id": "ant_5", "label": "antagonist_only", "name": "Carlos", "container": null,  "text": "Carlos dancou. Carlos sorriu." },
+    { "id": "ant_6", "label": "antagonist_only", "name": "Rita",   "container": null,  "text": "Rita caiu. Rita sorriu." },
+
+    { "id": "int_1", "label": "interior_only", "name": "Joao",   "container": "sala",    "text": "Joao esta na sala. Joao sorriu." },
+    { "id": "int_2", "label": "interior_only", "name": "Maria",  "container": "carro",   "text": "Maria esta no carro. Maria sorriu." },
+    { "id": "int_3", "label": "interior_only", "name": "Pedro",  "container": "caixa",   "text": "Pedro esta na caixa. Pedro sorriu." },
+    { "id": "int_4", "label": "interior_only", "name": "Ana",    "container": "quarto",  "text": "Ana esta no quarto. Ana sorriu." },
+    { "id": "int_5", "label": "interior_only", "name": "Carlos", "container": "casa",    "text": "Carlos esta na casa. Carlos sorriu." },
+    { "id": "int_6", "label": "interior_only", "name": "Rita",   "container": "cozinha", "text": "Rita esta na cozinha. Rita sorriu." },
+
+    { "id": "blend_1", "label": "blend", "name": "Joao",   "container": "sala",    "text": "Joao entrou na sala. Joao sorriu." },
+    { "id": "blend_2", "label": "blend", "name": "Maria",  "container": "carro",   "text": "Maria entrou no carro. Maria sorriu." },
+    { "id": "blend_3", "label": "blend", "name": "Pedro",  "container": "caixa",   "text": "Pedro entrou na caixa. Pedro sorriu." },
+    { "id": "blend_4", "label": "blend", "name": "Ana",    "container": "quarto",  "text": "Ana entrou no quarto. Ana sorriu." },
+    { "id": "blend_5", "label": "blend", "name": "Carlos", "container": "casa",    "text": "Carlos entrou na casa. Carlos sorriu." },
+    { "id": "blend_6", "label": "blend", "name": "Rita",   "container": "cozinha", "text": "Rita entrou na cozinha. Rita sorriu." },
+
+    { "id": "neu_1", "label": "neutral", "name": "Joao",   "container": null,  "text": "Joao e alto. Joao sorriu." },
+    { "id": "neu_2", "label": "neutral", "name": "Maria",  "container": null,  "text": "Maria e gentil. Maria sorriu." },
+    { "id": "neu_3", "label": "neutral", "name": "Pedro",  "container": null,  "text": "Pedro e forte. Pedro sorriu." },
+    { "id": "neu_4", "label": "neutral", "name": "Ana",    "container": null,  "text": "Ana e inteligente. Ana sorriu." },
+    { "id": "neu_5", "label": "neutral", "name": "Carlos", "container": null,  "text": "Carlos e paciente. Carlos sorriu." },
+    { "id": "neu_6", "label": "neutral", "name": "Rita",   "container": null,  "text": "Rita e curiosa. Rita sorriu." }
+  ]
+}
